@@ -16,8 +16,17 @@ app.use(bodyParser.json());
 const auth = require("./routes/auth");
 app.use("/auth", auth);
 
+// invalid token
+app.use(function (err, req, res, next) {
+  if (err.name === "UnauthorizedError") {
+    res.status(401).send("invalid token...");
+  } else {
+    next(err);
+  }
+});
+
 const port = process.env.PORT || 4000;
-app.listen(() => {
+app.listen(port, () => {
   mongoose.connection.once("open", () => {
     console.log("database connected");
   });
