@@ -29,6 +29,7 @@ router.post("/login", async (req, res) => {
   if (!(await bcrypt.compare(password, user.password))) {
     res.json({ status: "ko", message: "wrong credentials" });
   }
+  //TODO: refresh token for office if account is linked
   const token = jwt.sign({ ...user.toObject() }, process.env.SECRET, {
     algorithm: "HS256",
   });
@@ -40,7 +41,9 @@ router.get("/verify", isAuthenticated, (req, res) => {
 });
 
 router.get("/link", isAuthenticated, (req, res) => {
-  console.log(`https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
+  //TODO check if user already has an account linked
+  res.json({
+    url: `https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
     client_id=${process.env.AZURE_CLIENT_ID}
     &response_type=code
     &redirect_uri=${encodeURIComponent(
@@ -48,16 +51,8 @@ router.get("/link", isAuthenticated, (req, res) => {
     )}
     &response_mode=query
     &scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2Fuser.read
-    &state=${req.auth._id}`);
-  res.redirect(`https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
-    client_id=${process.env.AZURE_CLIENT_ID}
-    &response_type=code
-    &redirect_uri=${encodeURIComponent(
-      "http://localhost:4000/auth/link/callback"
-    )}
-    &response_mode=query
-    &scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2Fuser.read
-    &state=${req.auth._id}`);
+    &state=${req.auth._id}`,
+  });
 });
 
 router.get("/link/callback", async (req, res) => {
