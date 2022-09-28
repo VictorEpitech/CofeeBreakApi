@@ -16,6 +16,11 @@ const fundSchema = new Schema({
   reason: {
     type: String,
   },
+  payment_method: {
+    type: Schema.Types.ObjectId,
+    ref: "Payment",
+    required: true,
+  },
 });
 
 module.exports = model("Fund", fundSchema);

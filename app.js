@@ -16,8 +16,12 @@ app.use(bodyParser.json());
 const { isAuthenticated } = require("./utils/middleware");
 const auth = require("./routes/auth");
 const charges = require("./routes/charges");
+const funds = require("./routes/funds");
+const payments = require("./routes/payment");
 app.use("/auth", auth);
 app.use("/charges", isAuthenticated, charges);
+app.use("/funds", isAuthenticated, funds);
+app.use("/payments", isAuthenticated, payments);
 
 // invalid token
 app.use(function (err, req, res, next) {
