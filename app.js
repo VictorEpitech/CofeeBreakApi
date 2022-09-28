@@ -13,8 +13,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // routes
+const { isAuthenticated } = require("./utils/middleware");
 const auth = require("./routes/auth");
+const charges = require("./routes/charges");
 app.use("/auth", auth);
+app.use("/charges", isAuthenticated, charges);
 
 // invalid token
 app.use(function (err, req, res, next) {
