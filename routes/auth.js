@@ -47,7 +47,7 @@ router.get("/link", isAuthenticated, (req, res) => {
     client_id=${process.env.AZURE_CLIENT_ID}
     &response_type=code
     &redirect_uri=${encodeURIComponent(
-      "http://localhost:4000/auth/link/callback"
+      `${process.env.BASE_URL}/auth/link/callback`
     )}
     &response_mode=query
     &scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2Fuser.read
@@ -64,7 +64,7 @@ router.get("/link/callback", async (req, res) => {
     "offline_access https://graph.microsoft.com/user.read"
   );
   params.append("code", code);
-  params.append("redirect_uri", "http://localhost:4000/auth/link/callback");
+  params.append("redirect_uri", `${process.env.BASE_URL}/auth/link/callback`);
   params.append("grant_type", "authorization_code");
   params.append("client_secret", process.env.AZURE_CLIENT_SECRET);
   try {
