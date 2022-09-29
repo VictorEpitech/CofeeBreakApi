@@ -23,17 +23,17 @@ router.post("/login", async (req, res) => {
 
   let user = await User.findOne({ email });
   if (!user) {
-    res.json({ status: "ko", message: "user not found" });
+    res.status(500).json({ status: "ko", message: "user not found" });
     return;
   }
   if (!(await bcrypt.compare(password, user.password))) {
-    res.json({ status: "ko", message: "wrong credentials" });
+    res.status(500).json({ status: "ko", message: "wrong credentials" });
   }
   //TODO: refresh token for office if account is linked
   const token = jwt.sign({ ...user.toObject() }, process.env.SECRET, {
     algorithm: "HS256",
   });
-  res.json({ status: "ok", token });
+  res.json({ status: "ok", token, user });
 });
 
 router.get("/verify", isAuthenticated, (req, res) => {
@@ -82,8 +82,8 @@ router.get("/link/callback", async (req, res) => {
       user.access_token = ares.data.access_token;
       user.refresh_token = ares.data.refresh_token;
       await user.save();
-      res.json({
-        status: "ok",
+      res.render("callback", {
+        app_url: process.env.APP_URL,
         token: jwt.sign({ ...user.toObject() }, process.env.SECRET, {
           algorithm: "HS256",
         }),

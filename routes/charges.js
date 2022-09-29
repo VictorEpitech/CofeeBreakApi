@@ -30,7 +30,7 @@ router.put("/:id", async (req, res) => {
       .json({ status: "ko", message: "could not find requested record" });
     return;
   }
-  charge.charges = charges;
+  charge.charges += charges;
   await charge.save();
   res.json({ charge });
 });
