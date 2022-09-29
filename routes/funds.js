@@ -11,6 +11,11 @@ router.get("/", async (req, res) => {
   res.json({ funds });
 });
 
+router.get("/:id", async (req, res) => {
+  const funds = await Fund.find({ payment_method: req.params.id });
+  res.json({ funds });
+});
+
 router.post("/", async (req, res) => {
   const { date, amount, reason, payment_method } = req.body;
   let total = amount;
