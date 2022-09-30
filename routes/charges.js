@@ -7,6 +7,11 @@ router.get("/", async (req, res) => {
   res.json({ charges });
 });
 
+router.get("/:id", async (req, res) => {
+  const charge = await Charge.findById(req.params.id);
+  res.json({ charge });
+});
+
 router.post("/", async (req, res) => {
   const { email } = req.body;
   let charge = await Charge.findOne({ email });
