@@ -28,11 +28,13 @@ const charges = require("./routes/charges");
 const funds = require("./routes/funds");
 const payments = require("./routes/payment");
 const consumed = require("./routes/consumed");
+const scan = require("./routes/scan");
 app.use("/auth", auth);
 app.use("/charges", isAuthenticated, charges);
 app.use("/funds", isAuthenticated, funds);
 app.use("/payments", isAuthenticated, payments);
 app.use("/consumed", isAuthenticated, consumed);
+app.use("/scan", isAuthenticated, scan);
 
 // invalid token
 app.use(function (err, req, res, next) {

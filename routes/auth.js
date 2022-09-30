@@ -29,19 +29,46 @@ router.post("/login", async (req, res) => {
   if (!(await bcrypt.compare(password, user.password))) {
     res.status(500).json({ status: "ko", message: "wrong credentials" });
   }
-  //TODO: refresh token for office if account is linked
+  if (user.access_token) {
+    const params = new URLSearchParams();
+    params.append("client_id", process.env.AZURE_CLIENT_ID);
+    params.append(
+      "scope",
+      "offline_access https://graph.microsoft.com/user.read"
+    );
+    params.append("refresh_token", user.refresh_token);
+    params.append("grant_type", "refresh_token");
+    params.append("client_secret", process.env.AZURE_CLIENT_SECRET);
+    try {
+      const ares = await axios.default.post(
+        "https://login.microsoftonline.com/organizations/oauth2/v2.0/token",
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      user.access_token = ares.data.access_token;
+      user.refresh_token = ares.data.refresh_token;
+    } catch (err) {
+      user.access_token = null;
+      user.refresh_token = null;
+    }
+    await user.save();
+  }
   const token = jwt.sign({ ...user.toObject() }, process.env.SECRET, {
     algorithm: "HS256",
   });
   res.json({ status: "ok", token, user });
 });
 
-router.get("/verify", isAuthenticated, (req, res) => {
-  res.json(req.auth);
+router.get("/verify", isAuthenticated, async (req, res) => {
+  const user = await User.findById(req.auth._id);
+  res.json(user);
 });
 
 router.get("/link", isAuthenticated, (req, res) => {
-  //TODO check if user already has an account linked
   res.json({
     url: `https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
     client_id=${process.env.AZURE_CLIENT_ID}
