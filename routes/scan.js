@@ -8,7 +8,7 @@ router.get("/:cardSerial", async (req, res) => {
 
   const charge = await Charge.findOne({ serial: req.params.cardSerial });
   if (charge) {
-    res.json({ email: charge.email });
+    res.json({ charge });
     return;
   }
   if (!charge && loggedUser.access_token) {
@@ -21,9 +21,9 @@ router.get("/:cardSerial", async (req, res) => {
           },
         }
       );
-      const foundCharge = await Charge.findOne({ email: data.data.login });
+      let foundCharge = await Charge.findOne({ email: data.data.login });
       if (!foundCharge) {
-        await Charge.create({
+        foundCharge = await Charge.create({
           email: data.data.login,
           serial: req.params.cardSerial,
         });
@@ -31,7 +31,7 @@ router.get("/:cardSerial", async (req, res) => {
         foundCharge.serial = req.params.cardSerial;
         await foundCharge.save();
       }
-      res.json({ email: data.data.login });
+      res.json({ charge: foundCharge });
     } catch (error) {
       res
         .status(500)
