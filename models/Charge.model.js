@@ -16,4 +16,4 @@ const chargesSchema = new Schema({
   },
 });
 
-module.exports = model("Schema", chargesSchema);
+module.exports = model("Charge", chargesSchema);
