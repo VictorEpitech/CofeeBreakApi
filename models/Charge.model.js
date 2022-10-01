@@ -12,7 +12,6 @@ const chargesSchema = new Schema({
   },
   serial: {
     type: String,
-    unique: true,
   },
 });
 
